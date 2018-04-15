@@ -38,6 +38,19 @@ octaveKeysXML(Result) :-
 	]
 	.
 
+namedOctaveKeysXML(Result) :-
+	octaveKeysXML(Unnamed),
+	findall(
+		XML,
+		(
+			between(0, 7, Number),
+			whiteKeyNameXML(Number, XML)
+		),
+		WhiteKeyNames
+	),
+	append([element(g, [stroke = black, 'text-anchor' = middle, 'font-family'='Arial'], WhiteKeyNames)], Unnamed, Result)
+	.
+
 whiteKeyXML(Number, Result) :-
 	keyWidth(white, KeyWidth),
 	X is Number * KeyWidth,
@@ -51,6 +64,29 @@ blackKeyXML(Number, Result) :-
 	deltaBlackKey(I, Delta),
 	X is Delta + Number * WhiteKeyWidth,
 	Result = element(rect, [x = X, y = 0, width = BlackKeyWidth, height = 90], [])
+	.
+
+whiteKeyNameXML(Number, Result) :-
+	I is Number rem 7,
+	noteKey(ID, white(I)),
+	noteName(ID, Name, no),
+	keyWidth(white, KeyWidth),
+	keyHeight(white, KeyHeight),
+	X is (Number + 0.5) * KeyWidth,
+	Y is KeyHeight + 15,
+	Text = element(text, [], [Name]),
+	attributeTranslate(X, Y, Translate),
+	Result = element(g, [transform = Translate], [Text])
+	.
+
+attributeTranslate(X, Y, Result) :-
+	atom_chars('translate(', CL1),
+	atom_chars(X, CL2),
+	atom_chars(', ', CL3),
+	atom_chars(Y, CL4),
+	atom_chars(')', CL5),
+	foldl(append, [CL5, CL4, CL3, CL2, CL1], [], CLR),
+	atom_chars(Result, CLR)
 	.
 
 keyWidth(white, 22).
