@@ -5,11 +5,63 @@ writeXML(FileName, XML) :-
 		xmlns = 'http://www.w3.org/2000/svg',
 		version = '1.1'
 	],
-	MainElement =  element(svg, MainAttributes, XML),
+	computeRectangularRegion(XML, no, no, MX, MY),
+	getValue(MX, X),
+	getValue(MY, Y),
+	attributeTranslate(X, Y, Translate),
+	GElement = element(g, [transform = Translate], XML),
+	MainElement =  element(svg, MainAttributes, [GElement]),
 	open(FileName, write, Stream, [create([read, write]), buffer(line)]),
 	xml_write(Stream, MainElement, []),
 	close(Stream)
 	.
+
+computeRectangularRegion(XML, BX, BY, RX, RY) :-
+	XML = [],
+	RX = BX,
+	RY = BY
+	;
+	XML = [Element | Rest], !,
+	(	%
+		Element = element(g, Attributes, Contents),
+		(	%
+			Attributes = [translate(X, Y) | _], !,
+			improve(BX, X, RfX),
+			improve(BY, Y, RfY)
+		;
+			BX = RfX,
+			BY = RfY
+		),
+		computeRectangularRegion(Contents, RfX, RfY, ReX, ReY)
+	;
+		Element = element(rect, [x = X, y = Y | _], _),
+		improve(BX, X, ReX),
+		improve(BY, Y, ReY)
+	;
+		Element = element(circle, [cx = X_, cy = Y_, r = R | _], _),
+		X is X_ - R,
+		Y is Y_ - R,
+		improve(BX, X, ReX),
+		improve(BY, Y, ReY)
+	;
+		Element = element(text, _, _),
+		ReX = BX,
+		ReY = BY
+	),
+	computeRectangularRegion(Rest, ReX, ReY, RX, RY)
+	.
+
+improve(no, V, yes(V)).
+improve(yes(OldValue), CandidateValue, yes(NewValue)) :-
+	OldValue < CandidateValue
+	->
+	NewValue = OldValue
+	;
+	NewValue = CandidateValue
+	.
+
+getValue(no, 0).
+getValue(yes(Value), Result) :- Result is -Value.
 
 %% octaveKeysXML(+Result)
 %%
