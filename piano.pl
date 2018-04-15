@@ -51,6 +51,45 @@ namedOctaveKeysXML(Result) :-
 	append([element(g, [stroke = black, 'text-anchor' = middle, 'font-family'='Arial'], WhiteKeyNames)], Unnamed, Result)
 	.
 
+majorScaleKeysXML(Result, KeyNote) :-
+	scaleNotes(majorScale, ScaleNotes),
+	ScaleNotes = [KeyNote | _],
+	pianoNote(IDFrom, f, no, 2),
+	pianoNote(IDTo, f, no, 4),
+	keysBetweenXML(IDFrom, IDTo, [], [], BackgroundKeys),
+	findall(
+		XML,
+		(	%
+			member(ID, ScaleNotes),
+			pianoKeyMarkedXML(ID, _Colour, _Number, XML)
+		),
+		MarkedKeys
+	),
+	append(BackgroundKeys, [element(g, [stroke = orange, fill = yellow, 'stroke-width' = 2], MarkedKeys)], Result)
+	.
+
+keysBetweenXML(IDFrom, IDTo, WhiteKeysXML, BlackKeysXML, Result) :-
+	IDFrom > IDTo,
+	Result = [
+		element(g, [stroke = black, fill = white], WhiteKeysXML),
+		element(g, [stroke = black, fill = black], BlackKeysXML)
+	]
+	;
+	IDFrom =< IDTo,
+	pianoKeyXML(IDFrom, Colour, _, KeyXML),
+	(	%
+		Colour = white,
+		RecWKX = [KeyXML | WhiteKeysXML],
+		RecBKX = BlackKeysXML
+	;
+		Colour = black,
+		RecWKX = WhiteKeysXML,
+		RecBKX = [KeyXML | BlackKeysXML]
+	),
+	NextFrom is IDFrom + 1,
+	keysBetweenXML(NextFrom, IDTo, RecWKX, RecBKX, Result)
+	.
+
 whiteKeyXML(Number, Result) :-
 	keyWidth(white, KeyWidth),
 	X is Number * KeyWidth,
@@ -66,6 +105,23 @@ blackKeyXML(Number, Result) :-
 	Result = element(rect, [x = X, y = 0, width = BlackKeyWidth, height = 90], [])
 	.
 
+pianoKeyXML(ID, Colour, Number, Result) :-
+	pianoKey(ID, Colour, Number),
+	keyWidth(white, WhiteKeyWidth),
+	keyWidth(Colour, KeyWidth),
+	keyHeight(Colour, KeyHeight),
+	(	%
+		Colour = white, !,
+		Delta is 0
+	;
+		Colour = black, !,
+		I is abs(Number rem 7),
+		deltaBlackKey(I, Delta)
+	),
+	X is Delta + Number * WhiteKeyWidth,
+	Result = element(rect, [x = X, y = 0, width = KeyWidth, height = KeyHeight], [])
+	.
+
 whiteKeyNameXML(Number, Result) :-
 	I is Number rem 7,
 	noteKey(ID, white(I)),
@@ -77,6 +133,26 @@ whiteKeyNameXML(Number, Result) :-
 	Text = element(text, [], [Name]),
 	attributeTranslate(X, Y, Translate),
 	Result = element(g, [transform = Translate], [Text])
+	.
+
+pianoKeyMarkedXML(ID, Colour, Number, Result) :-
+	pianoKey(ID, Colour, Number),
+	keyWidth(white, WhiteKeyWidth),
+	keyWidth(black, BlackKeyWidth),
+	keyWidth(Colour, KeyWidth),
+	keyHeight(Colour, KeyHeight),
+	(	%
+		Colour = white, !,
+		Delta = 0
+	;
+		Colour = black, !,
+		I is abs(Number rem 7),
+		deltaBlackKey(I, Delta)
+	),
+	Radius is ceiling(BlackKeyWidth * 0.4),
+	X is Delta + Number * WhiteKeyWidth + KeyWidth / 2,
+	Y is KeyHeight - KeyWidth / 2,
+	Result = element(circle, [cx = X, cy = Y, r = Radius], [])
 	.
 
 attributeTranslate(X, Y, Result) :-
@@ -119,24 +195,32 @@ noteName(10, a, yes(sharp)).
 noteName(10, b, yes(flat)).
 noteName(11, b, no).
 
-noteKey( 0, white(0)).
-noteKey( 1, black(0)).
-noteKey( 2, white(1)).
-noteKey( 3, black(1)).
-noteKey( 4, white(2)).
-noteKey( 5, white(3)).
-noteKey( 6, black(3)).
-noteKey( 7, white(4)).
-noteKey( 8, black(4)).
-noteKey( 9, white(5)).
-noteKey(10, black(5)).
-noteKey(11, white(6)).
+noteKey( 0, white, 0).
+noteKey( 1, black, 0).
+noteKey( 2, white, 1).
+noteKey( 3, black, 1).
+noteKey( 4, white, 2).
+noteKey( 5, white, 3).
+noteKey( 6, black, 3).
+noteKey( 7, white, 4).
+noteKey( 8, black, 4).
+noteKey( 9, white, 5).
+noteKey(10, black, 5).
+noteKey(11, white, 6).
 
 pianoNote(ID, Name, Accidental, Octave) :-
 	between(-3, 84, ID),
 	Octave is div(ID, 12),
 	NM is mod(ID, 12),
 	noteName(NM, Name, Accidental)
+	.
+
+pianoKey(ID, Colour, Number) :-
+	between(-3, 84, ID),
+	Octave is div(ID, 12),
+	NM is mod(ID, 12),
+	noteKey(NM, Colour, C),
+	Number is C + (Octave + 1) * 7
 	.
 
 scaleDeltaNotes(majorScale, [2, 2, 1, 2, 2, 2, 1]).

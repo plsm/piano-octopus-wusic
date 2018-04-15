@@ -1,5 +1,16 @@
 :- [piano].
 
+testKeysPiano :-
+	keysBetweenXML(-3, 84, [], [], XML),
+	writeXML('piano.svg', XML)
+	.
+
+testMajorScaleKeys(FileName) :-
+	majorScaleKeysXML(XML, KeyNote),
+	format(atom(FileName), 'major-scale_~a.svg', [KeyNote]),
+	writeXML(FileName, XML)
+	.
+
 testScaleNotes :-
 	scaleNotes(Scale, ListNoteIDs),
 	format('~32a~n', Scale),
