@@ -132,3 +132,49 @@ noteKey( 9, white(5)).
 noteKey(10, black(5)).
 noteKey(11, white(6)).
 
+pianoNote(ID, Name, Accidental, Octave) :-
+	between(-3, 84, ID),
+	Octave is div(ID, 12),
+	NM is mod(ID, 12),
+	noteName(NM, Name, Accidental)
+	.
+
+scaleDeltaNotes(majorScale, [2, 2, 1, 2, 2, 2, 1]).
+
+scaleNotes(Scale, ListNotes) :-
+	scaleDeltaNotes(Scale, DeltaNotes),
+	between(30, 41, ID),
+	scanl(computeScaleNote, DeltaNotes, ID, ListNotes)
+	.
+
+computeScaleNote(DeltaNote, PreviousNote, ResultNote) :-
+	ResultNote is PreviousNote + DeltaNote
+	.
+
+noteID2Names(ListNoteIDs, ListNoteNames) :-
+	ListNoteIDs = [],
+	ListNoteNames = []
+	;
+	ListNoteIDs = [ID | RestNoteIDs],
+	ListNoteNames = [Result | RestNoteNames],
+	findall(
+		n(N, A, O),
+		pianoNote(ID, N, A, O),
+		Candidate
+	),
+	(
+		Candidate = [C],
+		Result = C
+	;
+		Candidate = [_, _],
+		Result = Candidate
+	),
+	noteID2Names(RestNoteIDs, RestNoteNames)
+	.
+
+%%% Local Variables:
+%%% mode: prolog
+%%% mode: flyspell-prog
+%%% mode: auto-complete
+%%% ispell-local-dictionary: "british"
+%%% End:
