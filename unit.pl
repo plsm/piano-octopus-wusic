@@ -11,6 +11,12 @@ testMajorScaleKeys(FileName) :-
 	writeXML(FileName, XML)
 	.
 
+testMajorTriadKeys(FileName) :-
+	majorTriadKeysXML(XML, RootNote),
+	format(atom(FileName), 'major-triad_~a.svg', [RootNote]),
+	writeXML(FileName, XML)
+	.
+
 testScaleNotes :-
 	scaleNotes(Scale, ListNoteIDs),
 	format('~32a~n', Scale),

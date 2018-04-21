@@ -120,6 +120,24 @@ majorScaleKeysXML(Result, KeyNote) :-
 	append(BackgroundKeys, [element(g, [stroke = orange, fill = yellow, 'stroke-width' = 2], MarkedKeys)], Result)
 	.
 
+majorTriadKeysXML(Result, RootNote) :-
+	chordNotes(majorTriad, ChordNotes),
+	ChordNotes = [RootNote | _],
+	pianoNote(IDFrom, c, no, 3),
+	pianoNote(IDTo, g, no, 4),
+	keysBetweenXML(IDFrom, IDTo, [], [], BackgroundKeys),
+	findall(
+		XML,
+		(	%
+			member(ID, ChordNotes),
+			pianoKeyMarkedXML(ID, _Colour, _Number, XML)
+		),
+		MarkedKeys
+	),
+	append(BackgroundKeys, [element(g, [stroke = orange, fill = yellow, 'stroke-width' = 2], MarkedKeys)], Result)
+	.
+
+
 keysBetweenXML(IDFrom, IDTo, WhiteKeysXML, BlackKeysXML, Result) :-
 	IDFrom > IDTo,
 	Result = [
@@ -280,6 +298,14 @@ scaleDeltaNotes(majorScale, [2, 2, 1, 2, 2, 2, 1]).
 scaleNotes(Scale, ListNotes) :-
 	scaleDeltaNotes(Scale, DeltaNotes),
 	between(30, 41, ID),
+	scanl(computeScaleNote, DeltaNotes, ID, ListNotes)
+	.
+
+chordDeltaNotes(majorTriad, [4, 3]).
+
+chordNotes(ChordName, ListNotes) :-
+	chordDeltaNotes(ChordName, DeltaNotes),
+	between(36, 47, ID),
 	scanl(computeScaleNote, DeltaNotes, ID, ListNotes)
 	.
 
