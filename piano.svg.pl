@@ -80,14 +80,7 @@ majorTriadKeysSVG(Result, RootNote) :-
 
 pianoRepresentation(IDFrom, IDTo, IDMarkedKeys, Result) :-
 	keysBetweenSVG(IDFrom, IDTo, [], [], BackgroundKeysSVG),
-	findall(
-		SVG,
-		(	%
-			member(ID, IDMarkedKeys),
-			pianoKeyMarkedSVG(ID, SVG)
-		),
-		MarkedKeysSVG
-	),
+	maplist(pianoKeyMarkedSVG, IDMarkedKeys, MarkedKeysSVG),
 	append(BackgroundKeysSVG, [element(g, [stroke = orange, fill = yellow, 'stroke-width' = 2], MarkedKeysSVG)], Result)
 	.
 
@@ -135,18 +128,8 @@ keysBetweenSVG(IDFrom, IDTo, WhiteKeysSVG, BlackKeysSVG, Result) :-
 % @arg Result the SVG representation of the outline of the piano key.
 pianoKeySVG(ID, Colour, Result) :-
 	pianoKeyXPosition(ID, Colour, X),
-	% keyWidth(white, WhiteKeyWidth),
 	keyWidth(Colour, KeyWidth),
 	keyHeight(Colour, KeyHeight),
-	% (	%
-	% 	Colour = white, !,
-	% 	Delta is 0
-	% ;
-	% 	Colour = black, !,
-	% 	I is abs(Number rem 7),
-	% 	deltaBlackKey(I, Delta)
-	% ),
-	% X is Delta + Number * WhiteKeyWidth,
 	Result = element(rect, [x = X, y = 0, width = KeyWidth, height = KeyHeight], [])
 	.
 
