@@ -26,6 +26,11 @@ testScaleNotes :-
 	fail
 	.
 
+testGrandPiano :-
+	grandPianoSVG(SVG),
+	writeSVG('grand-piano.svg', SVG)
+	.
+
 formatNoteNames([]).
 formatNoteNames([Notes | Rest]) :-
 	(	%

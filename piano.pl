@@ -44,7 +44,7 @@ namedOctaveKeysXML(Result) :-
 	.
 
 pianoNote(ID, Name, Accidental, Octave) :-
-	between(-3, 84, ID),
+	between(9, 96, ID),
 	Octave is div(ID, 12),
 	NM is mod(ID, 12),
 	noteName(NM, Name, Accidental)
@@ -62,7 +62,7 @@ scaleDeltaNotes(majorScale, [2, 2, 1, 2, 2, 2, 1]).
 
 scaleNotes(Scale, ListNotes) :-
 	scaleDeltaNotes(Scale, DeltaNotes),
-	between(30, 41, ID),
+	between(42, 53, ID),
 	scanl(computeScaleNote, DeltaNotes, ID, ListNotes)
 	.
 

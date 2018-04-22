@@ -62,12 +62,18 @@ improve(yes(OldValue), CandidateValue, yes(NewValue)) :-
 getValue(no, 0).
 getValue(yes(Value), Result) :- Result is -Value.
 
+grandPianoSVG(Result) :-
+	pianoNote(IDFrom, a, no, 0),
+	pianoNote(IDTo, c, no, 8),
+	pianoRepresentation(IDFrom, IDTo, [], yes, Result)
+	.
+
 majorScaleKeysSVG(Result, KeyNote) :-
 	scaleNotes(majorScale, ScaleNotes),
 	ScaleNotes = [KeyNote | _],
-	pianoNote(IDFrom, f, no, 2),
-	pianoNote(IDTo, f, no, 4),
-	pianoRepresentation(IDFrom, IDTo, ScaleNotes, Result)
+	pianoNote(IDFrom, f, no, 3),
+	pianoNote(IDTo, f, no, 5),
+	pianoRepresentation(IDFrom, IDTo, ScaleNotes, yes, Result)
 	.
 
 majorTriadKeysSVG(Result, RootNote) :-
@@ -75,14 +81,23 @@ majorTriadKeysSVG(Result, RootNote) :-
 	ChordNotes = [RootNote | _],
 	pianoNote(IDFrom, c, no, 3),
 	pianoNote(IDTo, g, no, 4),
-	pianoRepresentation(IDFrom, IDTo, ChordNotes, Result)
+	pianoRepresentation(IDFrom, IDTo, ChordNotes, no, Result)
 	.
 
-pianoRepresentation(IDFrom, IDTo, IDMarkedKeys, Result) :-
+pianoRepresentation(IDFrom, IDTo, IDMarkedKeys, DrawCentralDo, Result) :-
 	keysBetweenSVG(IDFrom, IDTo, [], [], BackgroundKeysSVG),
 	maplist(pianoKeyMarkedSVG, IDMarkedKeys, MarkedKeysSVG),
-	append(BackgroundKeysSVG, [element(g, [stroke = orange, fill = yellow, 'stroke-width' = 2], MarkedKeysSVG)], Result)
-	.
+	append(BackgroundKeysSVG, [element(g, [stroke = orange, fill = yellow, 'stroke-width' = 2], MarkedKeysSVG)], PartialResult),
+	(	%
+		DrawCentralDo = yes,
+		IDFrom =< 48,
+		IDTo >= 48
+	->
+		centralDo(CentralDoSVG),
+		append(PartialResult, [CentralDoSVG], Result)
+	;
+		Result = PartialResult
+	).
 
 %! keysBetweenSVG(+IDFrom:int, +IDTo:int, +WhiteKeysSVG:list, +BlackKeysSVG:list, -Result:svg) is semidet.
 %
@@ -151,6 +166,21 @@ pianoKeyMarkedSVG(ID, Result) :-
 	Result = element(circle, [cx = X, cy = Y, r = Radius], [])
 	.
 
+%! centralDo(-Result:xml) is det
+%
+% Return a SVG representation of a mark in the central Do of a piano.
+%
+% @arg Result a SVG representation of a mark in the central Do of a piano.
+centralDo(Result) :-
+	Number = 28,
+	keyWidth(white, KeyWidth),
+	keyHeight(white, KeyHeight),
+	Length is KeyWidth / 5,
+	X is Number * KeyWidth + KeyWidth / 2 - Length / 2,
+	Y is KeyHeight - 3 * Length / 2,
+	Result = element(g, [stroke = black, fill = black], [element(rect, [x = X, y = Y, width = Length, height = Length], [])])
+	.
+
 pianoKeyNameSVG(ID, Result) :-
 	pianoKeyXPosition(ID, Colour, KeyXPosition),
 	keyWidth(Colour, KeyWidth),
@@ -164,7 +194,7 @@ pianoKeyNameSVG(ID, Result) :-
 	.
 
 pianoKeyXPosition(ID, Colour, Result) :-
-	between(-3, 84, ID),
+	between(9, 96, ID),
 	Octave is div(ID, 12),
 	NM is mod(ID, 12),
 	noteKey(NM, Colour, C),
