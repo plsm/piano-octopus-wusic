@@ -1,20 +1,20 @@
 :- [piano].
 
 testKeysPiano :-
-	keysBetweenXML(-3, 84, [], [], XML),
-	writeXML('piano.svg', XML)
+	keysBetweenSVG(-3, 84, [], [], SVG),
+	writeSVG('piano.svg', SVG)
 	.
 
 testMajorScaleKeys(FileName) :-
-	majorScaleKeysXML(XML, KeyNote),
+	majorScaleKeysSVG(SVG, KeyNote),
 	format(atom(FileName), 'major-scale_~a.svg', [KeyNote]),
-	writeXML(FileName, XML)
+	writeSVG(FileName, SVG)
 	.
 
 testMajorTriadKeys(FileName) :-
-	majorTriadKeysXML(XML, RootNote),
+	majorTriadKeysSVG(SVG, RootNote),
 	format(atom(FileName), 'major-triad_~a.svg', [RootNote]),
-	writeXML(FileName, XML)
+	writeSVG(FileName, SVG)
 	.
 
 testScaleNotes :-
