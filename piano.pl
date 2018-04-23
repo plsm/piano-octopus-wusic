@@ -50,14 +50,6 @@ pianoNote(ID, Name, Accidental, Octave) :-
 	noteName(NM, Name, Accidental)
 	.
 
-pianoKey(ID, Colour, Number) :-
-	between(-3, 84, ID),
-	Octave is div(ID, 12),
-	NM is mod(ID, 12),
-	noteKey(NM, Colour, C),
-	Number is C + (Octave + 1) * 7
-	.
-
 scaleDeltaNotes(majorScale, [2, 2, 1, 2, 2, 2, 1]).
 
 scaleNotes(Scale, ListNotes) :-
