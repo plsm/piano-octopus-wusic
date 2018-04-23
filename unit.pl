@@ -1,10 +1,5 @@
 :- [piano].
 
-testKeysPiano :-
-	keysBetweenSVG(-3, 84, [], [], SVG),
-	writeSVG('piano.svg', SVG)
-	.
-
 testMajorScaleKeys(FileName) :-
 	majorScaleKeysSVG(SVG, KeyNote),
 	format(atom(FileName), 'major-scale_~a.svg', [KeyNote]),
