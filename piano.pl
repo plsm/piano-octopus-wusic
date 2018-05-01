@@ -50,7 +50,7 @@ pianoNote(ID, Name, Accidental, Octave) :-
 	noteName(NM, Name, Accidental)
 	.
 
-scaleDeltaNotes(majorScale, [2, 2, 1, 2, 2, 2, 1]).
+scaleDeltaNotes(major, [2, 2, 1, 2, 2, 2, 1]).
 
 %%! scaleNotes(?Scale:term, ?KeyNote, ?SetNotes:set) is multi
 %%
