@@ -1,10 +1,17 @@
 :- [piano].
 
-testMajorScaleKeys(FileName) :-
-	majorScaleKeysSVG(SVG, KeyNote),
-	format(atom(FileName), 'major-scale_~a.svg', [KeyNote]),
+testScaleSequenceKeys(FileName) :-
+	scaleSequenceKeysSVG(SVG, ScaleName, KeyNote),
+	format(atom(FileName), 'scale-sequence-~a-~a.svg', [ScaleName, KeyNote]),
 	writeSVG(FileName, SVG)
 	.
+
+testScaleNotesKeys(FileName) :-
+	scaleNotesKeysSVG(SVG, ScaleName, KeyNote),
+	format(atom(FileName), 'scale-notes-~a-~a.svg', [ScaleName, KeyNote]),
+	writeSVG(FileName, SVG)
+	.
+
 
 testMajorTriadKeys(FileName) :-
 	majorTriadKeysSVG(SVG, RootNote),

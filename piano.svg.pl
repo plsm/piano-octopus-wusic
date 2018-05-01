@@ -68,12 +68,19 @@ grandPianoSVG(Result) :-
 	pianoRepresentation(IDFrom, IDTo, [], yes, Result)
 	.
 
-majorScaleKeysSVG(Result, KeyNote) :-
-	scaleNotes(majorScale, ScaleNotes),
-	ScaleNotes = [KeyNote | _],
+scaleSequenceKeysSVG(Result, ScaleName, KeyNote) :-
+	scaleSequence(ScaleName, ListNotes),
+	ListNotes = [KeyNote | _],
 	pianoNote(IDFrom, f, no, 3),
 	pianoNote(IDTo, f, no, 5),
-	pianoRepresentation(IDFrom, IDTo, ScaleNotes, yes, Result)
+	pianoRepresentation(IDFrom, IDTo, ListNotes, yes, Result)
+	.
+
+scaleNotesKeysSVG(Result, ScaleName, KeyNote) :-
+	scaleNotes(ScaleName, KeyNote, SetNotes),
+	pianoNote(IDFrom, c, no, 1),
+	pianoNote(IDTo, b, no, 1),
+	pianoRepresentation(IDFrom, IDTo, SetNotes, no, Result)
 	.
 
 majorTriadKeysSVG(Result, RootNote) :-

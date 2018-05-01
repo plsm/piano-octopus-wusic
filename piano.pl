@@ -52,10 +52,38 @@ pianoNote(ID, Name, Accidental, Octave) :-
 
 scaleDeltaNotes(majorScale, [2, 2, 1, 2, 2, 2, 1]).
 
-scaleNotes(Scale, ListNotes) :-
+%%! scaleNotes(?Scale:term, ?KeyNote, ?SetNotes:set) is multi
+%%
+%% Computes the notes that are part of a scale in a way that allows
+%% comparison of notes of different scales.
+%%
+%% The returned list of notes is not the sequence that the scale is played.
+%% It is a list of note IDs starting at 12.
+%%
+%% We assume that the distance between the lowest and highest pitch notes
+%% is equal or less than an octave.
+scaleNotes(Scale, KeyNote, SetNotes) :-
+	scaleSequence(Scale, SequenceNotes),
+	append([KeyNote], _, SequenceNotes),
+	append(Notes, [_], SequenceNotes),
+	maplist(computeScaleNote, Notes, ListNotes),
+	list_to_ord_set(ListNotes, SetNotes)
+	.
+
+%%! scaleSequence(?Scale:term, ?ListNotes:set) is multi
+%%
+%% Computes the notes that are part of a scale in a way that allows
+%% comparison of notes of different scales.
+%%
+%% The returned list of notes is not the sequence that the scale is played.
+%% It is a list of note IDs starting at 12.
+%%
+%% We assume that the distance between the lowest and highest pitch notes
+%% is equal or less than an octave.
+scaleSequence(Scale, ListNotes) :-
 	scaleDeltaNotes(Scale, DeltaNotes),
-	between(42, 53, ID),
-	scanl(computeScaleNote, DeltaNotes, ID, ListNotes)
+	between(42, 53, KeyNote),
+	scanl(computeScaleSequence, DeltaNotes, KeyNote, ListNotes)
 	.
 
 chordDeltaNotes(majorTriad, [4, 3]).
@@ -66,8 +94,12 @@ chordNotes(ChordName, ListNotes) :-
 	scanl(computeScaleNote, DeltaNotes, ID, ListNotes)
 	.
 
-computeScaleNote(DeltaNote, PreviousNote, ResultNote) :-
+computeScaleSequence(DeltaNote, PreviousNote, ResultNote) :-
 	ResultNote is PreviousNote + DeltaNote
+	.
+
+computeScaleNote(InNote, OutNote) :-
+	OutNote is (InNote mod 12) + 12
 	.
 
 noteID2Names(ListNoteIDs, ListNoteNames) :-
