@@ -50,7 +50,15 @@ pianoNote(ID, Name, Accidental, Octave) :-
 	noteName(NM, Name, Accidental)
 	.
 
+%%! scaleDeltaNotes(?Name, ?ListDeltaTones) is multi
+%%
+%% This predicate contains the representation of a scale as a list of the
+%% tone difference between consecutive notes.
 scaleDeltaNotes(major, [2, 2, 1, 2, 2, 2, 1]).
+scaleDeltaNotes(dorian, [2, 1, 2, 2, 2, 1, 2]).
+scaleDeltaNotes(mixolydian, [2, 2, 1, 2, 2, 1, 2]).
+scaleDeltaNotes('major-pentatonic', [2, 2, 3, 2, 3]).
+scaleDeltaNotes('minor-pentatonic', [3, 2, 2, 3, 2]).
 
 %%! scaleNotes(?Scale:term, ?KeyNote, ?SetNotes:set) is multi
 %%
