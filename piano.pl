@@ -95,11 +95,17 @@ scaleSequence(Scale, ListNotes) :-
 	.
 
 chordDeltaNotes(majorTriad, [4, 3]).
+chordDeltaNotes(minorTriad, [3, 4]).
+chordDeltaNotes(major7, [4, 3, 4]).
+chordDeltaNotes(minor7, [3, 4, 3]).
+chordDeltaNotes(dominant7, [4, 3, 3]).
+chordDeltaNotes(minorMajor7, [3, 4, 4]).
 
-chordNotes(ChordName, ListNotes) :-
+chordNotes(ChordName, KeyNote, SetNotes) :-
 	chordDeltaNotes(ChordName, DeltaNotes),
-	between(36, 47, ID),
-	scanl(computeScaleNote, DeltaNotes, ID, ListNotes)
+	between(42, 53, KeyNote),
+	scanl(computeScaleSequence, DeltaNotes, KeyNote, ListNotes),
+	list_to_ord_set(ListNotes, SetNotes)
 	.
 
 computeScaleSequence(DeltaNote, PreviousNote, ResultNote) :-

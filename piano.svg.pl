@@ -91,6 +91,14 @@ majorTriadKeysSVG(Result, RootNote) :-
 	pianoRepresentation(IDFrom, IDTo, ChordNotes, no, Result)
 	.
 
+chordKeysSVG(Result, ChordName, KeyNote) :-
+	chordNotes(ChordName, KeyNote, SetNotes),
+	pianoNote(IDFrom, f, no, 3),
+	pianoNote(IDTo, f, no, 5),
+	pianoRepresentation(IDFrom, IDTo, SetNotes, yes, Result)
+	.
+
+
 pianoRepresentation(IDFrom, IDTo, IDMarkedKeys, DrawCentralDo, Result) :-
 	keysBetweenSVG(IDFrom, IDTo, [], [], BackgroundKeysSVG),
 	maplist(pianoKeyMarkedSVG, IDMarkedKeys, MarkedKeysSVG),
